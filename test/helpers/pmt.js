@@ -3,23 +3,23 @@ const { creator } = require('./general')
 const { hexToAscii } = require('web3-utils')
 
 const defaultName = 'PicsumToken'
-const defaultSymbol = 'TNF'
+const defaultSymbol = 'pmt'
 const defaultUriBase = 'https://picsum.photos/200/300?image='
 
 const setupContract = async (name, symbol, config) => {
-  const tnf = await PicsumToken.new(name, symbol, config)
+  const pmt = await PicsumToken.new(name, symbol, config)
 
-  return tnf
+  return pmt
 }
 
-const testInitialValues = async tnf => {
-  const name = await tnf.name()
-  const symbol = await tnf.symbol()
-  const totalSupply = await tnf.totalSupply()
-  const creatorBalance = await tnf.balanceOf(creator)
-  const initialTokenOwner = await tnf.ownerOf(0)
-  const tokenExists = await tnf.exists(0)
-  const uriBase = await tnf.uriBase()
+const testInitialValues = async pmt => {
+  const name = await pmt.name()
+  const symbol = await pmt.symbol()
+  const totalSupply = await pmt.totalSupply()
+  const creatorBalance = await pmt.balanceOf(creator)
+  const initialTokenOwner = await pmt.ownerOf(0)
+  const tokenExists = await pmt.exists(0)
+  const uriBase = await pmt.uriBase()
   const uriBaseAscii = hexToAscii(uriBase)
 
   assert.equal(name, defaultName, 'name should match expected name')
@@ -39,14 +39,14 @@ const testInitialValues = async tnf => {
   )
 }
 
-const testMint = async (tnf, receiver, config) => {
-  const preReceiverBalance = await tnf.balanceOf(receiver)
-  const preTotalSupply = await tnf.totalSupply()
+const testMint = async (pmt, receiver, config) => {
+  const preReceiverBalance = await pmt.balanceOf(receiver)
+  const preTotalSupply = await pmt.totalSupply()
 
-  await tnf.mint(receiver, config)
+  await pmt.mint(receiver, config)
 
-  const postReceiverBalance = await tnf.balanceOf(receiver)
-  const postTotalSupply = await tnf.totalSupply()
+  const postReceiverBalance = await pmt.balanceOf(receiver)
+  const postTotalSupply = await pmt.totalSupply()
 
   assert.equal(
     postReceiverBalance.sub(preReceiverBalance).toString(),
@@ -61,14 +61,14 @@ const testMint = async (tnf, receiver, config) => {
 }
 
 // TODO double check that tokenId no longer belongs to sender & belongs to receiver
-const testTransfer = async (tnf, sender, receiver, tokenId, config) => {
-  const preReceiverBalance = await tnf.balanceOf(receiver)
-  const preSenderBalance = await tnf.balanceOf(sender)
+const testTransfer = async (pmt, sender, receiver, tokenId, config) => {
+  const preReceiverBalance = await pmt.balanceOf(receiver)
+  const preSenderBalance = await pmt.balanceOf(sender)
 
-  await tnf.transferFrom(sender, receiver, tokenId, config)
+  await pmt.transferFrom(sender, receiver, tokenId, config)
 
-  const postReceiverBalance = await tnf.balanceOf(receiver)
-  const postSenderBalance = await tnf.balanceOf(sender)
+  const postReceiverBalance = await pmt.balanceOf(receiver)
+  const postSenderBalance = await pmt.balanceOf(sender)
 
   assert.equal(
     postReceiverBalance.sub(preReceiverBalance).toString(),
@@ -82,14 +82,14 @@ const testTransfer = async (tnf, sender, receiver, tokenId, config) => {
   )
 }
 
-const testBurn = async (tnf, burner, tokenId, config) => {
-  const preBurnerBalance = await tnf.balanceOf(burner)
-  const preTotalSupply = await tnf.totalSupply()
+const testBurn = async (pmt, burner, tokenId, config) => {
+  const preBurnerBalance = await pmt.balanceOf(burner)
+  const preTotalSupply = await pmt.totalSupply()
 
-  await tnf.burn(tokenId, config)
+  await pmt.burn(tokenId, config)
 
-  const postBurnerBalance = await tnf.balanceOf(burner)
-  const postTotalSupply = await tnf.totalSupply()
+  const postBurnerBalance = await pmt.balanceOf(burner)
+  const postTotalSupply = await pmt.totalSupply()
 
   assert.equal(
     preBurnerBalance.sub(postBurnerBalance).toString(),
@@ -103,8 +103,8 @@ const testBurn = async (tnf, burner, tokenId, config) => {
   )
 }
 
-const testConcatenteUri = async (tnf, tokenId) => {
-  const concatenated = await tnf.concatenateUri(tokenId)
+const testConcatenteUri = async (pmt, tokenId) => {
+  const concatenated = await pmt.concatenateUri(tokenId)
 
   assert.equal(
     concatenated,
@@ -113,8 +113,8 @@ const testConcatenteUri = async (tnf, tokenId) => {
   )
 }
 
-const testGetTokenUri = async (tnf, tokenId) => {
-  const tokenUri = await tnf.tokenURI(tokenId)
+const testGetTokenUri = async (pmt, tokenId) => {
+  const tokenUri = await pmt.tokenURI(tokenId)
 
   assert.equal(
     tokenUri,

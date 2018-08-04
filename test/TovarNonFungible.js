@@ -9,7 +9,7 @@ const {
   testBurn,
   testConcatenteUri,
   testGetTokenUri
-} = require('./helpers/tnf')
+} = require('./helpers/pmt')
 const {
   creator,
   tokenReceiver,
@@ -19,37 +19,37 @@ const {
 
 describe('when deploying an NFT', () => {
   contract('PicsumToken', () => {
-    let tnf
+    let pmt
     // assumed to be 0 due to constructor creating first token for creator
     const creatorTokenId = 0
 
     before('setup contract', async () => {
-      tnf = await setupContract(defaultName, defaultSymbol, defaultUriBase, {
+      pmt = await setupContract(defaultName, defaultSymbol, defaultUriBase, {
         from: creator
       })
     })
 
     it('should start with the correct values', async () => {
-      await testInitialValues(tnf)
+      await testInitialValues(pmt)
     })
 
     it('should mint NOT mint a new token if NOT creator', async () => {
       await assertRevert(
-        testMint(tnf, tokenReceiver, {
+        testMint(pmt, tokenReceiver, {
           from: other
         })
       )
     })
 
     it('should mint a new token if creator', async () => {
-      await testMint(tnf, tokenReceiver, {
+      await testMint(pmt, tokenReceiver, {
         from: creator
       })
     })
 
     it('should NOT transfer a token to receiver if sender is not owner', async () => {
       await assertRevert(
-        testTransfer(tnf, creator, tokenReceiver, creatorTokenId, {
+        testTransfer(pmt, creator, tokenReceiver, creatorTokenId, {
           from: other
         })
       )
@@ -57,24 +57,24 @@ describe('when deploying an NFT', () => {
 
     // TODO: create a receiver contract!!!
     it('should transfer a token to receiver', async () => {
-      await testTransfer(tnf, creator, tokenReceiver, creatorTokenId, {
+      await testTransfer(pmt, creator, tokenReceiver, creatorTokenId, {
         from: creator
       })
     })
 
     it('should burn a token as owner', async () => {
-      const creatorTokens = await tnf.getOwnerTokens(creator)
-      await testBurn(tnf, creator, creatorTokens[0])
+      const creatorTokens = await pmt.getOwnerTokens(creator)
+      await testBurn(pmt, creator, creatorTokens[0])
     })
 
     it('should concatenateUri correctly', async () => {
-      const creatorTokens = await tnf.getOwnerTokens(creator)
-      await testConcatenteUri(tnf, creatorTokens[0])
+      const creatorTokens = await pmt.getOwnerTokens(creator)
+      await testConcatenteUri(pmt, creatorTokens[0])
     })
 
     it('should return the correct uri for a given token', async () => {
-      const creatorTokens = await tnf.getOwnerTokens(creator)
-      await testGetTokenUri(tnf, creatorTokens[0])
+      const creatorTokens = await pmt.getOwnerTokens(creator)
+      await testGetTokenUri(pmt, creatorTokens[0])
     })
   })
 })
