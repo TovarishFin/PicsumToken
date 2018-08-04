@@ -97,6 +97,30 @@ const testApprove = async (pmt, spender, tokenId, config) => {
   assert.equal(postApproved, spender, 'postApproved should equal spender')
 }
 
+const testSetApprovalForAll = async (
+  pmt,
+  operator,
+  shouldBeApproved,
+  config
+) => {
+  const { from: owner } = config
+
+  const preIsOperator = await pmt.isApprovedForAll(owner, operator)
+
+  await pmt.setApprovalForAll(operator, shouldBeApproved, config)
+
+  const postIsOperator = await pmt.isApprovedForAll(owner, operator)
+
+  assert(
+    preIsOperator !== shouldBeApproved,
+    'test usage error: contract state should be inverse of desired state'
+  )
+  assert(
+    postIsOperator === shouldBeApproved,
+    'postIsOperator should match shouldBeApproved'
+  )
+}
+
 const testBurn = async (pmt, burner, tokenId, config) => {
   const preBurnerBalance = await pmt.balanceOf(burner)
   const preTotalSupply = await pmt.totalSupply()
@@ -147,6 +171,7 @@ module.exports = {
   testMint,
   testTransferFrom,
   testApprove,
+  testSetApprovalForAll,
   testBurn,
   testConcatenteUri,
   testGetTokenUri

@@ -7,6 +7,7 @@ const {
   testMint,
   testTransferFrom,
   testApprove,
+  testSetApprovalForAll,
   testBurn,
   testConcatenteUri,
   testGetTokenUri
@@ -15,6 +16,7 @@ const {
   creator,
   tokenReceiver,
   tokenSpender,
+  tokenOperator,
   other,
   assertRevert
 } = require('./helpers/general')
@@ -71,6 +73,17 @@ describe('when deploying an NFT', () => {
       creatorTokens = await pmt.getOwnerTokens(creator)
     })
 
+    it('should burn a token as owner', async () => {
+      selectedTokenId = creatorTokens[0]
+
+      await testBurn(pmt, creator, selectedTokenId, {
+        from: creator
+      })
+
+      // update creatorTokens array after transfer
+      creatorTokens = await pmt.getOwnerTokens(creator)
+    })
+
     it('should approve another address to use tokens', async () => {
       selectedTokenId = creatorTokens[0]
 
@@ -96,11 +109,22 @@ describe('when deploying an NFT', () => {
       creatorTokens = await pmt.getOwnerTokens(creator)
     })
 
-    it('should burn a token as owner', async () => {
+    it('should setApprovalForAll', async () => {
+      const isCurrentlyOperator = await pmt.isApprovedForAll(
+        creator,
+        tokenOperator
+      )
+
+      await testSetApprovalForAll(pmt, tokenOperator, !isCurrentlyOperator, {
+        from: creator
+      })
+    })
+
+    it('should burn tokens as an tokenOperator of users tokens', async () => {
       selectedTokenId = creatorTokens[0]
 
       await testBurn(pmt, creator, selectedTokenId, {
-        from: creator
+        from: tokenOperator
       })
 
       // update creatorTokens array after transfer
