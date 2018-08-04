@@ -23,9 +23,9 @@ contract PicsumToken is ERC721Token {
   {
     creator = msg.sender;
     uriBase = bytes(_uriBase);
-    mint(msg.sender);
-    mint(msg.sender);
-    mint(msg.sender);
+    for (uint256 _i = 0; _i < 10; _i++) {
+      mint(msg.sender);
+    }
   }
 
   function concatenateUri(

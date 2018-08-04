@@ -1,3 +1,5 @@
+const BigNumber = require('bignumber.js')
+
 const accounts = web3.eth.accounts
 
 const creator = accounts[0]
@@ -16,6 +18,9 @@ const assertRevert = async promise => {
   }
 }
 
+const bigZero = new BigNumber(0)
+const addressZero = '0x' + '0'.repeat(40)
+
 module.exports = {
   accounts,
   creator,
@@ -23,5 +28,7 @@ module.exports = {
   tokenReceiver,
   tokenSpender,
   other,
-  assertRevert
+  assertRevert,
+  bigZero,
+  addressZero
 }

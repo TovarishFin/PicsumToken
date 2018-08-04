@@ -1,5 +1,5 @@
 const PicsumToken = artifacts.require('PicsumToken')
-const { creator } = require('./general')
+const { creator, addressZero } = require('./general')
 const { hexToAscii } = require('web3-utils')
 
 const defaultName = 'PicsumToken'
@@ -24,8 +24,8 @@ const testInitialValues = async pmt => {
 
   assert.equal(name, defaultName, 'name should match expected name')
   assert.equal(symbol, defaultSymbol, 'symbol should match expected symbol')
-  assert.equal(totalSupply.toString(), '3', 'totalSupply should be 1')
-  assert.equal(creatorBalance.toString(), '3', 'creator balance should be 1')
+  assert.equal(totalSupply.toString(), '10', 'totalSupply should be 1')
+  assert.equal(creatorBalance.toString(), '10', 'creator balance should be 1')
   assert(tokenExists, 'first token created should exist')
   assert.equal(
     initialTokenOwner,
@@ -61,7 +61,7 @@ const testMint = async (pmt, receiver, config) => {
 }
 
 // TODO double check that tokenId no longer belongs to sender & belongs to receiver
-const testTransfer = async (pmt, sender, receiver, tokenId, config) => {
+const testTransferFrom = async (pmt, sender, receiver, tokenId, config) => {
   const preReceiverBalance = await pmt.balanceOf(receiver)
   const preSenderBalance = await pmt.balanceOf(sender)
 
@@ -80,6 +80,21 @@ const testTransfer = async (pmt, sender, receiver, tokenId, config) => {
     '1',
     'sender token balance should be decremented by 1'
   )
+}
+
+const testApprove = async (pmt, spender, tokenId, config) => {
+  const preApproved = await pmt.getApproved(tokenId)
+
+  await pmt.approve(spender, tokenId, config)
+
+  const postApproved = await pmt.getApproved(tokenId)
+
+  assert.equal(
+    preApproved,
+    addressZero,
+    'preApproved should have no approved spender'
+  )
+  assert.equal(postApproved, spender, 'postApproved should equal spender')
 }
 
 const testBurn = async (pmt, burner, tokenId, config) => {
@@ -130,7 +145,8 @@ module.exports = {
   setupContract,
   testInitialValues,
   testMint,
-  testTransfer,
+  testTransferFrom,
+  testApprove,
   testBurn,
   testConcatenteUri,
   testGetTokenUri
