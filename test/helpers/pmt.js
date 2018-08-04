@@ -1,4 +1,7 @@
 const PicsumToken = artifacts.require('PicsumToken')
+const PicsumWallet = artifacts.require('PicsumWallet')
+const NonCompliantWallet = artifacts.require('NonCompliantWallet')
+
 const { creator, addressZero } = require('./general')
 const { hexToAscii } = require('web3-utils')
 
@@ -8,8 +11,9 @@ const defaultUriBase = 'https://picsum.photos/200/300?image='
 
 const setupContract = async (name, symbol, config) => {
   const pmt = await PicsumToken.new(name, symbol, config)
-
-  return pmt
+  const pmw = await PicsumWallet.new(pmt.address)
+  const ncw = await NonCompliantWallet.new(pmt.address)
+  return { pmt, pmw, ncw }
 }
 
 const testInitialValues = async pmt => {
@@ -69,6 +73,7 @@ const testTransferFrom = async (pmt, sender, receiver, tokenId, config) => {
 
   const postReceiverBalance = await pmt.balanceOf(receiver)
   const postSenderBalance = await pmt.balanceOf(sender)
+  const postTokenOwner = await pmt.ownerOf(tokenId)
 
   assert.equal(
     postReceiverBalance.sub(preReceiverBalance).toString(),
@@ -80,6 +85,41 @@ const testTransferFrom = async (pmt, sender, receiver, tokenId, config) => {
     '1',
     'sender token balance should be decremented by 1'
   )
+  assert.equal(postTokenOwner, receiver, 'postTokenOwner should equal receiver')
+}
+
+const testSafeTransferFrom = async (
+  pmt,
+  sender,
+  receiver,
+  tokenId,
+  data,
+  config
+) => {
+  const preReceiverBalance = await pmt.balanceOf(receiver)
+  const preSenderBalance = await pmt.balanceOf(sender)
+
+  if (data) {
+    await pmt.safeTransferFrom(sender, receiver, tokenId, data, config)
+  } else {
+    await pmt.safeTransferFrom(sender, receiver, tokenId, config)
+  }
+
+  const postReceiverBalance = await pmt.balanceOf(receiver)
+  const postSenderBalance = await pmt.balanceOf(sender)
+  const postTokenOwner = await pmt.ownerOf(tokenId)
+
+  assert.equal(
+    postReceiverBalance.sub(preReceiverBalance).toString(),
+    '1',
+    'receiver token balance should be incremented by 1'
+  )
+  assert.equal(
+    preSenderBalance.sub(postSenderBalance).toString(),
+    '1',
+    'sender token balance should be decremented by 1'
+  )
+  assert.equal(postTokenOwner, receiver, 'postTokenOwner should equal receiver')
 }
 
 const testApprove = async (pmt, spender, tokenId, config) => {
@@ -170,6 +210,7 @@ module.exports = {
   testInitialValues,
   testMint,
   testTransferFrom,
+  testSafeTransferFrom,
   testApprove,
   testSetApprovalForAll,
   testBurn,

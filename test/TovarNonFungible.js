@@ -6,6 +6,7 @@ const {
   testInitialValues,
   testMint,
   testTransferFrom,
+  testSafeTransferFrom,
   testApprove,
   testSetApprovalForAll,
   testBurn,
@@ -24,14 +25,33 @@ const {
 describe('when deploying an NFT', () => {
   contract('PicsumToken', () => {
     let pmt
+    let pmw
+    let ncw
     let creatorTokens
     let selectedTokenId // used for various tests...
-    // assumed to be 0 due to constructor creating first token for creator
 
-    before('setup contract', async () => {
-      pmt = await setupContract(defaultName, defaultSymbol, defaultUriBase, {
-        from: creator
-      })
+    beforeEach('update selectedTokenId', () => {
+      selectedTokenId = creatorTokens[0]
+    })
+
+    before('setup contracts', async () => {
+      const contracts = await setupContract(
+        defaultName,
+        defaultSymbol,
+        defaultUriBase,
+        {
+          from: creator
+        }
+      )
+      pmt = contracts.pmt
+      pmw = contracts.pmw
+      ncw = contracts.ncw
+
+      creatorTokens = await pmt.getOwnerTokens(creator)
+    })
+
+    afterEach('update creatorTokens', async () => {
+      // update creatorTokens array after transfer
       creatorTokens = await pmt.getOwnerTokens(creator)
     })
 
@@ -54,8 +74,6 @@ describe('when deploying an NFT', () => {
     })
 
     it('should NOT transfer a token to receiver if sender is not owner', async () => {
-      selectedTokenId = creatorTokens[0]
-
       await assertRevert(
         testTransferFrom(pmt, creator, tokenReceiver, selectedTokenId, {
           from: other
@@ -63,30 +81,53 @@ describe('when deploying an NFT', () => {
       )
     })
 
-    // TODO: create a receiver contract!!!
     it('should transfer a token to receiver', async () => {
       await testTransferFrom(pmt, creator, tokenReceiver, selectedTokenId, {
         from: creator
       })
+    })
 
-      // update creatorTokens array after transfer
-      creatorTokens = await pmt.getOwnerTokens(creator)
+    it('should safeTransferFrom to a user address', async () => {
+      await testSafeTransferFrom(
+        pmt,
+        creator,
+        tokenReceiver,
+        selectedTokenId,
+        null,
+        {
+          from: creator
+        }
+      )
+    })
+
+    it('should NOT safeTransferFrom to a non-compliant wallet contract', async () => {
+      await assertRevert(
+        testSafeTransferFrom(pmt, creator, ncw.address, selectedTokenId, null, {
+          from: creator
+        })
+      )
+    })
+
+    it('should safeTransferFrom to a compliant wallet contract', async () => {
+      await testSafeTransferFrom(
+        pmt,
+        creator,
+        pmw.address,
+        selectedTokenId,
+        null,
+        {
+          from: creator
+        }
+      )
     })
 
     it('should burn a token as owner', async () => {
-      selectedTokenId = creatorTokens[0]
-
       await testBurn(pmt, creator, selectedTokenId, {
         from: creator
       })
-
-      // update creatorTokens array after transfer
-      creatorTokens = await pmt.getOwnerTokens(creator)
     })
 
     it('should approve another address to use tokens', async () => {
-      selectedTokenId = creatorTokens[0]
-
       await testApprove(pmt, tokenSpender, selectedTokenId, {
         from: creator
       })
@@ -104,9 +145,6 @@ describe('when deploying an NFT', () => {
       await testBurn(pmt, creator, selectedTokenId, {
         from: tokenSpender
       })
-
-      // update creatorTokens array after transfer
-      creatorTokens = await pmt.getOwnerTokens(creator)
     })
 
     it('should setApprovalForAll', async () => {
@@ -121,18 +159,12 @@ describe('when deploying an NFT', () => {
     })
 
     it('should burn tokens as an tokenOperator of users tokens', async () => {
-      selectedTokenId = creatorTokens[0]
-
       await testBurn(pmt, creator, selectedTokenId, {
         from: tokenOperator
       })
-
-      // update creatorTokens array after transfer
-      creatorTokens = await pmt.getOwnerTokens(creator)
     })
 
     it('should concatenateUri correctly', async () => {
-      selectedTokenId = creatorTokens[0]
       await testConcatenteUri(pmt, selectedTokenId)
     })
 
