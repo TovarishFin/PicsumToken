@@ -4,7 +4,7 @@ const defaultState = {
 
 const reducer = (state = defaultState, action = {}) => {
   switch (action.type) {
-    case 'ERROR':
+    case 'ERRORS:error-occurred':
       return {
         ...state,
         errors: [...state.errors, action.payload]

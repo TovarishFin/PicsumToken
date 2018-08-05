@@ -42,6 +42,11 @@ module.exports = {
         use: 'babel-loader'
       },
       {
+        test: /\.json$/,
+        exclude: /node_modules/,
+        use: 'json-loader'
+      },
+      {
         test: /\.css$/,
         exclude: /node_modules/,
         use: {
@@ -67,7 +72,8 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.css']
+    modules: [path.resolve('./build'), path.resolve('./node_modules')],
+    extensions: ['.js', '.json', '.css']
   },
   plugins: [
     new webpack.optimize.LimitChunkCountPlugin({

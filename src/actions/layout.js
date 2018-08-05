@@ -1,22 +1,22 @@
 export const closeDrawer = () => ({
-  type: 'SET_DRAWER',
+  type: 'LAYOUT:set-drawer',
   payload: false
 })
 
 export const toggleDrawer = () => ({
-  type: 'TOGGLE_DRAWER'
+  type: 'LAYOUT:toggle-drawer'
 })
 
 export const openDrawer = () => ({
-  type: 'SET_DRAWER',
+  type: 'LAYOUT:set-drawer',
   payload: true
 })
 
 export const setNotification = payload => ({
-  type: 'SET_NOTIFIER',
+  type: 'LAYOUT:set-notifier',
   payload
 })
 
 export const closeNotification = () => ({
-  type: 'CLOSE_NOTIFIER'
+  type: 'LAYOUT:close-notifier'
 })

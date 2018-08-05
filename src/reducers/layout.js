@@ -6,17 +6,17 @@ const defaultState = {
 
 const reducer = (state = defaultState, action = {}) => {
   switch (action.type) {
-    case 'SET_DRAWER':
+    case 'LAYOUT:set-drawer':
       return { ...state, drawerOpen: action.payload }
-    case 'TOGGLE_DRAWER':
+    case 'LAYOUT:toggle-drawer':
       return { ...state, drawerOpen: !state.drawerOpen }
-    case 'SET_NOTIFIER':
+    case 'LAYOUT:set-notifier':
       return {
         ...state,
         notificationOpen: true,
         notificationMessage: action.payload
       }
-    case 'CLOSE_NOTIFIER':
+    case 'LAYOUT:close-notifier':
       return {
         ...state,
         notificationOpen: false,

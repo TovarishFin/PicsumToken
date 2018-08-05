@@ -40,13 +40,12 @@ export const getWeb3 = () =>
     }
 
     if (window.web3) {
-      return resolve(window.web3)
+      resolve(new Web3(web3.currentProvider))
     }
 
     window.addEventListener('load', () => {
-      let { web3 } = window
-      if (typeof web3 !== 'undefined') {
-        web3 = new Web3(web3.currentProvider)
+      if (typeof window.web3 !== 'undefined') {
+        return resolve(new Web3(window.web3.currentProvider))
       } else {
         // TODO: change to mainnet when ready to rock
         const engine = ZeroClientProvider({
@@ -57,7 +56,7 @@ export const getWeb3 = () =>
           getAccounts: cb => cb(null, []),
           rpcUrl: 'https://kovan.infura.io'
         })
-        web3 = new Web3(engine)
+        const web3 = new Web3(engine)
         window.web3 = web3
       }
 

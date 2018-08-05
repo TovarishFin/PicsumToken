@@ -14,4 +14,4 @@ yarn-error.log
 yark.lock
 /buildClient
 /buildServer
-/build
+.env
