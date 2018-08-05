@@ -12,3 +12,6 @@ secrets.js
 .vscode
 yarn-error.log
 yark.lock
+/buildClient
+/buildServer
+/build
