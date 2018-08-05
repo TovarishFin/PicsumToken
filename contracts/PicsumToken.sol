@@ -96,5 +96,4 @@ contract PicsumToken is ERC721Token {
   {
     return ownedTokens[_owner];
   }
-
 }

@@ -2,18 +2,29 @@ const PicsumToken = artifacts.require('PicsumToken')
 const PicsumWallet = artifacts.require('PicsumWallet')
 const NonCompliantWallet = artifacts.require('NonCompliantWallet')
 
-const { creator, addressZero } = require('./general')
+const { creator, walletOwner, addressZero } = require('./general')
 const { hexToAscii } = require('web3-utils')
 
 const defaultName = 'PicsumToken'
 const defaultSymbol = 'pmt'
 const defaultUriBase = 'https://picsum.photos/200/300?image='
 
-const setupContracts = async (name, symbol, config, walletConfig) => {
-  const pmt = await PicsumToken.new(name, symbol, config)
+const setupContracts = async (name, symbol, uriBase, config, walletConfig) => {
+  const pmt = await PicsumToken.new(name, symbol, uriBase, config)
   const pmw = await PicsumWallet.new(pmt.address, walletConfig)
   const pmwAsPmt = PicsumToken.at(pmw.address)
   const ncw = await NonCompliantWallet.new(pmt.address, walletConfig)
+
+  const actualCreator = await pmt.creator()
+  const actualWalletOwner = await pmw.owner()
+
+  assert.equal(actualCreator, creator, 'actualCreator whould match creator')
+  assert.equal(
+    actualWalletOwner,
+    walletOwner,
+    'actualWalletOwner should match walletOwner'
+  )
+
   return { pmt, pmw, pmwAsPmt, ncw }
 }
 

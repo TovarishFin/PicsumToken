@@ -3,14 +3,23 @@ const {
   defaultName,
   defaultSymbol,
   defaultUriBase,
-  testSetApprovalForAll,
-  testSafeTransferFrom
+  testSetApprovalForAll
 } = require('./helpers/pmt')
-const { creator, tokenReceiver, walletOwner } = require('./helpers/general')
+const {
+  testUpdateTokenAddress,
+  testSafeTransferFrom
+} = require('./helpers/pmw')
+const {
+  creator,
+  tokenReceiver,
+  walletOwner,
+  other,
+  assertRevert
+} = require('./helpers/general')
 
 describe('when using PicsumWallet', () => {
   contract('PicsumWallet', () => {
-    let pmt, pmw, pmwAsPmt, creatorTokens, selectedTokenId
+    let pmt, pmw, pmwAsPmt, ncw, creatorTokens, selectedTokenId
 
     beforeEach('update selectedTokenId', () => {
       selectedTokenId = creatorTokens[0]
@@ -29,8 +38,9 @@ describe('when using PicsumWallet', () => {
         }
       )
       pmt = contracts.pmt
-      pmw = contracts.pmw
-      pmwAsPmt = contracts.pmwAsPmt
+      pmw = contracts.pmw // same address as pmwAsPmt
+      pmwAsPmt = contracts.pmwAsPmt // same address as pmw
+      ncw = contracts.ncw
 
       // set PicsumWallet to operator of creator tokens
       await testSetApprovalForAll(pmt, pmw.address, true, {
@@ -47,7 +57,7 @@ describe('when using PicsumWallet', () => {
     })
 
     it('should forward calls to PicsumToken', async () => {
-      const name = await pmwAsPmt.name()
+      const name = await pmwAsPmt.name({ from: walletOwner })
       assert.equal(
         name,
         defaultName,
@@ -56,14 +66,9 @@ describe('when using PicsumWallet', () => {
     })
 
     it('should safeTransferFrom from operator to pmw', async () => {
-      const isApprovedForAll = await pmwAsPmt.isApprovedForAll(
-        creator,
-        pmwAsPmt.address
-      )
-      console.log(isApprovedForAll)
-      assert(isApprovedForAll, 'pmw should be approved for creator')
       await testSafeTransferFrom(
         pmwAsPmt,
+        pmt,
         creator,
         tokenReceiver,
         selectedTokenId,
@@ -72,6 +77,20 @@ describe('when using PicsumWallet', () => {
           from: walletOwner
         }
       )
+    })
+
+    it('should NOT updateTokenAddress if NOT owner', async () => {
+      await assertRevert(
+        testUpdateTokenAddress(pmw, ncw.address, {
+          from: other
+        })
+      )
+    })
+
+    it('shoud updateTokenAddress', async () => {
+      await testUpdateTokenAddress(pmw, ncw.address, {
+        from: walletOwner
+      })
     })
   })
 })
