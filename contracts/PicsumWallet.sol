@@ -9,8 +9,14 @@ contract PicsumWallet is ERC721Receiver, Ownable {
   bytes public data;
 
   event TokenAddressUpdated(
-    address _oldAddress,
-    address _newAddress
+    address oldAddress,
+    address newAddress
+  );
+
+  event ReceivedToken(
+    address indexed operator,
+    address indexed from,
+    uint256 indexed tokenId
   );
 
   constructor(
@@ -57,6 +63,9 @@ contract PicsumWallet is ERC721Receiver, Ownable {
     returns(bytes4)
   {
     data = _data;
+
+    emit ReceivedToken(_operator, _from, _tokenId);
+    
     return ERC721_RECEIVED;
   }
 

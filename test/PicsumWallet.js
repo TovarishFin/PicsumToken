@@ -7,7 +7,8 @@ const {
 } = require('./helpers/pmt')
 const {
   testUpdateTokenAddress,
-  testSafeTransferFrom
+  testSafeTransferFrom,
+  testBurn
 } = require('./helpers/pmw')
 const {
   creator,
@@ -56,7 +57,7 @@ describe('when using PicsumWallet', () => {
       creatorTokens = await pmt.getOwnerTokens(creator)
     })
 
-    it('should forward calls to PicsumToken', async () => {
+    it('should forward static calls to PicsumToken', async () => {
       const name = await pmwAsPmt.name({ from: walletOwner })
       assert.equal(
         name,
@@ -65,8 +66,26 @@ describe('when using PicsumWallet', () => {
       )
     })
 
-    it('should safeTransferFrom from operator to pmw', async () => {
+    it('should NOT setTransferFrom if not walletOwner', async () => {
+      await assertRevert(
+        testSafeTransferFrom(
+          pmw,
+          pmwAsPmt,
+          pmt,
+          creator,
+          tokenReceiver,
+          selectedTokenId,
+          null,
+          {
+            from: other
+          }
+        )
+      )
+    })
+
+    it('should safeTransferFrom from creator to tokenReceiver with pmw as operator', async () => {
       await testSafeTransferFrom(
+        pmw,
         pmwAsPmt,
         pmt,
         creator,
@@ -77,6 +96,36 @@ describe('when using PicsumWallet', () => {
           from: walletOwner
         }
       )
+    })
+
+    // TODO: find out why this doesn't work perhaps arg overflows with fallback?
+    // it('should safeTransferFrom as operator with data', async () => {
+    //   await testSafeTransferFrom(
+    //     pmw,
+    //     pmwAsPmt,
+    //     pmt,
+    //     creator,
+    //     tokenReceiver,
+    //     selectedTokenId,
+    //     '0x64657270',
+    //     {
+    //       from: walletOwner
+    //     }
+    //   )
+    // })
+
+    it('should NOT burn tokens when NOT walletOwner', async () => {
+      await assertRevert(
+        testBurn(pmwAsPmt, pmt, creator, selectedTokenId, {
+          from: other
+        })
+      )
+    })
+
+    it('should burn tokens as operator', async () => {
+      await testBurn(pmwAsPmt, pmt, creator, selectedTokenId, {
+        from: walletOwner
+      })
     })
 
     it('should NOT updateTokenAddress if NOT owner', async () => {

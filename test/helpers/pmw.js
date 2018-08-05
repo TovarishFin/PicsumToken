@@ -7,6 +7,7 @@ const testUpdateTokenAddress = async (pmw, newAddress, config) => {
 }
 
 const testSafeTransferFrom = async (
+  pmw,
   pmwAsPmt,
   pmt,
   sender,
@@ -27,6 +28,7 @@ const testSafeTransferFrom = async (
   const postReceiverBalance = await pmt.balanceOf(receiver)
   const postSenderBalance = await pmt.balanceOf(sender)
   const postTokenOwner = await pmt.ownerOf(tokenId)
+  const postData = await pmw.data()
 
   assert.equal(
     postReceiverBalance.sub(preReceiverBalance).toString(),
@@ -39,9 +41,35 @@ const testSafeTransferFrom = async (
     'sender token balance should be decremented by 1'
   )
   assert.equal(postTokenOwner, receiver, 'postTokenOwner should equal receiver')
+
+  if (data) {
+    assert.equal(postData, data, 'postData should match data')
+  }
+}
+
+const testBurn = async (pmwAsPmt, pmt, burner, tokenId, config) => {
+  const preBurnerBalance = await pmt.balanceOf(burner)
+  const preTotalSupply = await pmt.totalSupply()
+
+  await pmwAsPmt.burn(tokenId, config)
+
+  const postBurnerBalance = await pmt.balanceOf(burner)
+  const postTotalSupply = await pmt.totalSupply()
+
+  assert.equal(
+    preBurnerBalance.sub(postBurnerBalance).toString(),
+    '1',
+    'burner token balance should be decremented by 1'
+  )
+  assert.equal(
+    preTotalSupply.sub(postTotalSupply).toString(),
+    '1',
+    'totalSupply should be decremented by 1'
+  )
 }
 
 module.exports = {
   testUpdateTokenAddress,
-  testSafeTransferFrom
+  testSafeTransferFrom,
+  testBurn
 }
