@@ -9,11 +9,12 @@ const defaultName = 'PicsumToken'
 const defaultSymbol = 'pmt'
 const defaultUriBase = 'https://picsum.photos/200/300?image='
 
-const setupContract = async (name, symbol, config) => {
+const setupContracts = async (name, symbol, config, walletConfig) => {
   const pmt = await PicsumToken.new(name, symbol, config)
-  const pmw = await PicsumWallet.new(pmt.address)
-  const ncw = await NonCompliantWallet.new(pmt.address)
-  return { pmt, pmw, ncw }
+  const pmw = await PicsumWallet.new(pmt.address, walletConfig)
+  const pmwAsPmt = PicsumToken.at(pmw.address)
+  const ncw = await NonCompliantWallet.new(pmt.address, walletConfig)
+  return { pmt, pmw, pmwAsPmt, ncw }
 }
 
 const testInitialValues = async pmt => {
@@ -64,7 +65,6 @@ const testMint = async (pmt, receiver, config) => {
   )
 }
 
-// TODO double check that tokenId no longer belongs to sender & belongs to receiver
 const testTransferFrom = async (pmt, sender, receiver, tokenId, config) => {
   const preReceiverBalance = await pmt.balanceOf(receiver)
   const preSenderBalance = await pmt.balanceOf(sender)
@@ -206,7 +206,7 @@ module.exports = {
   defaultName,
   defaultSymbol,
   defaultUriBase,
-  setupContract,
+  setupContracts,
   testInitialValues,
   testMint,
   testTransferFrom,

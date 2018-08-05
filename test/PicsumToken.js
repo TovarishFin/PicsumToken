@@ -2,7 +2,7 @@ const {
   defaultName,
   defaultSymbol,
   defaultUriBase,
-  setupContract,
+  setupContracts,
   testInitialValues,
   testMint,
   testTransferFrom,
@@ -18,35 +18,36 @@ const {
   tokenReceiver,
   tokenSpender,
   tokenOperator,
+  walletOwner,
   other,
   assertRevert
 } = require('./helpers/general')
 
 describe('when deploying an NFT', () => {
   contract('PicsumToken', () => {
-    let pmt
-    let pmw
-    let ncw
-    let creatorTokens
-    let selectedTokenId // used for various tests...
+    let pmt, pmw, ncw, creatorTokens, selectedTokenId
 
     beforeEach('update selectedTokenId', () => {
       selectedTokenId = creatorTokens[0]
     })
 
     before('setup contracts', async () => {
-      const contracts = await setupContract(
+      const contracts = await setupContracts(
         defaultName,
         defaultSymbol,
         defaultUriBase,
         {
           from: creator
+        },
+        {
+          from: walletOwner
         }
       )
       pmt = contracts.pmt
       pmw = contracts.pmw
       ncw = contracts.ncw
 
+      // update creatorTokens array after transfer
       creatorTokens = await pmt.getOwnerTokens(creator)
     })
 

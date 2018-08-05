@@ -7,7 +7,8 @@ const tokenOwner = accounts[1]
 const tokenReceiver = accounts[2]
 const tokenSpender = accounts[3]
 const tokenOperator = accounts[4]
-const other = accounts[5]
+const walletOwner = accounts[5]
+const other = accounts[6]
 
 const assertRevert = async promise => {
   try {
@@ -29,6 +30,7 @@ module.exports = {
   tokenReceiver,
   tokenSpender,
   tokenOperator,
+  walletOwner,
   other,
   assertRevert,
   bigZero,

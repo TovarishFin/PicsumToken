@@ -88,6 +88,12 @@ contract PicsumWallet is ERC721Receiver, Ownable {
         0 // outsize = mem outsize  mem[out..(out+outsize)
       )
 
+      returndatacopy(
+        0x0, // t = mem position to
+        0x0,  // f = mem position from
+        returndatasize // s = size bytes
+      )
+
       // Check if the call was successful
       if iszero(result) {
         // Revert if call failed
@@ -96,7 +102,7 @@ contract PicsumWallet is ERC721Receiver, Ownable {
         // Return if call succeeded
         return(
           0x0,
-          0x01 // true
+          returndatasize
         )
     }
   }
