@@ -7,3 +7,5 @@ export { default as title } from './title'
 export { default as contracts } from './contracts'
 
 export { default as layout } from './layout'
+
+export { default as network } from './network'

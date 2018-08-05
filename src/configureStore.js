@@ -6,7 +6,7 @@ import createSagaMiddleware from 'redux-saga'
 import routesMap from './routesMap'
 import * as reducers from './reducers'
 import * as actionCreators from './actions'
-// import contractSagas from './sagas/contracts'
+import rootSaga from './sagas'
 
 const composeEnhancers = (...args) =>
   isClient()
@@ -38,7 +38,7 @@ const configureStore = (history, preLoadedState) => {
   }
 
   if (isClient()) {
-    // sagaMiddleware.run(contractSagas)
+    sagaMiddleware.run(rootSaga)
   }
 
   return { store, thunk }

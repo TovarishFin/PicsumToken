@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withStyles } from '@material-ui/core/styles'
-import { networkSelector } from '../../selectors/network'
+import { networkIdSelector } from '../../selectors/network'
 
 const styles = {
   link: {
@@ -64,7 +64,7 @@ const EtherscanLink = ({
 )
 
 const mapStateToProps = state => ({
-  networkNumber: networkSelector(state)
+  networkNumber: networkIdSelector(state)
 })
 
 export default connect(mapStateToProps)(withStyles(styles)(EtherscanLink))

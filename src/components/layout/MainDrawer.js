@@ -5,7 +5,7 @@ import Divider from '@material-ui/core/Divider'
 import { connect } from 'react-redux'
 import Link from 'redux-first-router-link'
 import { drawerOpenSelector } from '../../selectors/layout'
-import { coinbaseSelector, networkSelector } from '../../selectors/network'
+import { coinbaseSelector, networkIdSelector } from '../../selectors/network'
 import { closeDrawer } from '../../actions/layout'
 import { goToPage } from '../../actions/page'
 
@@ -57,7 +57,7 @@ const MainDrawer = ({
 const mapStateToProps = state => ({
   drawerOpen: drawerOpenSelector(state),
   coinbase: coinbaseSelector(state),
-  networkNumber: networkSelector(state)
+  networkNumber: networkIdSelector(state)
 })
 
 const mapDispatchToProps = {

@@ -1,11 +1,14 @@
 import { pathOr } from 'ramda'
-import { zeroAddress } from '../utils/ethereum'
+import { addressZero } from '../utils/ethereum'
 
-export const networkSelector = state =>
-  pathOr('1', ['contracts', 'network'], state)
+export const networkIdSelector = state =>
+  pathOr('1', ['network', 'networkId'], state)
 
 export const coinbaseSelector = state =>
-  pathOr(zeroAddress, ['contracts', 'coinbase'], state)
+  pathOr(addressZero, ['network', 'coinbase'], state)
 
 export const blockNumberSelector = state =>
-  pathOr(0, ['contracts', 'blockNumber'], state)
+  pathOr(0, ['network', 'blockNumber'], state)
+
+export const web3ReadySelector = state =>
+  pathOr(false, ['network', 'web3Ready'], state)

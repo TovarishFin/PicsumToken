@@ -3,11 +3,11 @@ import Web3 from 'web3'
 //import ProviderEngine from 'web3-provider-engine'
 import ZeroClientProvider from 'web3-provider-engine/zero'
 
-export const zeroAddress = `0x${'0'.repeat(40)}`
+export const addressZero = `0x${'0'.repeat(40)}`
 
-export const prunedZeroAddress = '0'.repeat(40)
+export const prunedaddressZero = '0'.repeat(40)
 
-export const getNetwork = () =>
+export const getNetworkId = () =>
   new Promise((resolve, reject) => {
     if (typeof window != 'object' || !window.web3) {
       return reject(new Error('no web3 available'))
