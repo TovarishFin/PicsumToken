@@ -6,9 +6,9 @@ import { errOccurred } from '../actions/errors'
 function* rootSaga() {
   try {
     yield call(checkWeb3)
-    yield fork(contractSagas)
-    yield fork(networkSagas)
     yield call(getNetworkInfo)
+    yield fork(networkSagas)
+    yield fork(contractSagas)
   } catch (err) {
     yield put(errOccurred(err.message, err.stack, 'root saga'))
   }

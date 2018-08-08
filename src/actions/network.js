@@ -1,3 +1,7 @@
+export const checkWeb3 = () => ({
+  type: 'NETWORK:checkWeb3'
+})
+
 export const gotWeb3 = () => ({
   type: 'NETWORK:got-web3'
 })

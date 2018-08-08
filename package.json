@@ -5,6 +5,7 @@
     "lint:sol": "solium --dir ./contracts",
     "lint:js": "prettier migrations/* test/* --write",
     "clean:install": "rimraf node_modules && yarn install",
+    "clean:contracts": "rimraf build && truffle compile",
     "clean:js": "rimraf buildClient buildServer",
     "start": "yarn run clean:js && NODE_ENV=development babel-watch server/index.js",
     "migrate:contracts:rinkeby": "truffle migrate --network rinkeby"

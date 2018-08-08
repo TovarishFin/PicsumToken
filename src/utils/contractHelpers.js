@@ -7,7 +7,7 @@ export const setupPicsumToken = async networkId => {
 
   const picsumToken = new web3.eth.Contract(
     PicsumToken.abi,
-    PicsumToken.networks[networkId]
+    PicsumToken.networks[networkId].address
   )
 
   return picsumToken
@@ -17,7 +17,7 @@ export const setupPicsumWallet = async networkId => {
   const web3 = await getWeb3()
   const picsumWallet = new web3.eth.Contract(
     PicsumWallet.abi,
-    PicsumWallet.networks[networkId]
+    PicsumWallet.networks[networkId].address
   )
 
   return picsumWallet

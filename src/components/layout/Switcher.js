@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { TransitionGroup, Transition } from 'transition-group'
 import universal from 'react-universal-component'
 import { withStyles } from '@material-ui/core/styles'
-import Loading from '../pages/Loading'
+import Loading from './Loading'
 import Err from '../pages/Error'
 import isLoading from '../../selectors/isLoading'
 

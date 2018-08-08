@@ -13,6 +13,7 @@ import {
   networkIdSelector,
   blockNumberSelector
 } from '../selectors/network'
+import { getTokenBalance, getUserTokens } from '../actions/contracts'
 
 const pollingDelay = 3000
 
@@ -35,6 +36,11 @@ export function* getNetworkInfo() {
       yield put(
         gotNetworkInfo({ coinbase, networkId, blockNumber, web3Ready: true })
       )
+
+      if (coinbase) {
+        yield put(getTokenBalance(coinbase))
+        yield put(getUserTokens(coinbase))
+      }
     }
   } catch (err) {
     yield put(
@@ -74,6 +80,7 @@ export function* checkWeb3() {
 function* networkSagas() {
   try {
     yield fork(watchNetworkInfo)
+    yield takeEvery('NETWORK:checkWeb3', checkWeb3)
     yield takeEvery('NETWORK:get-network-info', getNetworkInfo)
   } catch (err) {
     yield put(errOccurred(err.message, err.stack, 'network sagas root'))
