@@ -1,4 +1,13 @@
-import { all, call, put, takeEvery, select } from 'redux-saga/effects'
+import {
+  all,
+  call,
+  put,
+  takeEvery,
+  select,
+  fork,
+  take
+} from 'redux-saga/effects'
+import { eventChannel } from 'redux-saga'
 import { setupPicsumToken } from '../utils/contractHelpers'
 import { errOccurred } from '../actions/errors'
 import {
@@ -10,6 +19,46 @@ import {
   gotTokenUri
 } from '../actions/contracts'
 import { coinbaseSelector, networkIdSelector } from '../selectors/network'
+
+const picsumEventChannel = pmt =>
+  eventChannel(emitter => {
+    const picsumEvent = pmt.allEvents({
+      fromBlock: 'latest',
+      remove: true
+    })
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    picsumEvent.watch((err, res) => {
+      emitter(res)
+    })
+
+    return () => picsumEvent.stopWatching()
+  })
+
+function* watchForPicsumEvents() {
+  try {
+    const networkId = yield select(networkIdSelector)
+    const pmt = yield call(setupPicsumToken, networkId)
+    const channel = yield call(picsumEventChannel, pmt)
+
+    while (true) {
+      const picsumEvent = yield take(channel)
+      yield fork(handlePicsumEvent, picsumEvent)
+    }
+  } catch (err) {
+    yield put(errOccurred(err.message, err.stack, 'picsum event watcher'))
+  }
+}
+
+function* handlePicsumEvent(picsumEvent) {
+  try {
+    console.log(picsumEvent)
+    const coinbase = yield select(coinbaseSelector)
+    yield put(getUserTokens({payload: coinbase}))
+  } catch (err) {
+    yield put(errOccurred, err.message, err.stack, 'handle picsum event')
+  }
+}
 
 export function* getTokenName() {
   try {
@@ -112,6 +161,21 @@ export function* getTokenUri(action) {
   }
 }
 
+export function* transferToken(action) {
+  try {
+    const { tokenId, receiver } = action.payload
+    const networkId = yield select(networkIdSelector)
+    const pmt = yield call(setupPicsumToken, networkId)
+    const coinbase = yield select(coinbaseSelector)
+
+    yield call(pmt.methods.transferFrom(coinbase, receiver, tokenId).send, {
+      from: coinbase
+    })
+  } catch (err) {
+    yield put(errOccurred(err.message, err.stack, 'transfer token'))
+  }
+}
+
 function* contractSagas() {
   try {
     yield takeEvery('CONTRACTS:get-total-supply', getTotalSupply)
@@ -120,6 +184,8 @@ function* contractSagas() {
     yield takeEvery('CONTRACTS:get-token-balance', getTokenBalance)
     yield takeEvery('CONTRACTS:get-user-tokens', getUserTokens)
     yield takeEvery('CONTRACTS:get-token-uri', getTokenUri)
+    yield takeEvery('CONTRACTS:transfer-token', transferToken)
+    yield fork(watchForPicsumEvents)
   } catch (err) {
     yield put(errOccurred(err.message, err.stack, 'contract sagas root'))
   }

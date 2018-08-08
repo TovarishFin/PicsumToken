@@ -5,6 +5,7 @@ const reducer = (state = 'HOME', action = {}) =>
 
 const components = {
   HOME: 'Home',
+  TRANSFER: 'Transfer',
   [NOT_FOUND]: 'NotFound'
 }
 

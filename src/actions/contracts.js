@@ -63,3 +63,12 @@ export const gotTokenUri = (tokenId, tokenUri) => ({
     tokenUri
   }
 })
+
+// crap name... i know...
+export const startTransferToken = (tokenId, receiver) => ({
+  type: 'CONTRACTS:transfer-token',
+  payload: {
+    tokenId,
+    receiver
+  }
+})

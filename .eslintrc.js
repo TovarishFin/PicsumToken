@@ -129,7 +129,7 @@ module.exports = {
       "react/jsx-curly-spacing": "error",
       "react/jsx-equals-spacing": "error",
       "react/jsx-first-prop-new-line": "error",
-      "react/jsx-handler-names": "error",
+      "react/jsx-handler-names": "off",
       "react/jsx-no-bind": [
         "error",
         {

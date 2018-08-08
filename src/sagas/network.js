@@ -37,7 +37,7 @@ export function* getNetworkInfo() {
         gotNetworkInfo({ coinbase, networkId, blockNumber, web3Ready: true })
       )
 
-      if (coinbase) {
+      if (coinbase != oldCoinbase) {
         yield put(getTokenBalance(coinbase))
         yield put(getUserTokens(coinbase))
       }

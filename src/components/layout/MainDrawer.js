@@ -50,6 +50,14 @@ const MainDrawer = ({
         {'Home'}
       </MenuItem>
       <Divider />
+      <MenuItem
+        component={Link}
+        exact="true"
+        onClick={dispatchCloseDrawer}
+        to="/transfer"
+      >
+        {'Transfer'}
+      </MenuItem>
     </Drawer>
   </div>
 )
