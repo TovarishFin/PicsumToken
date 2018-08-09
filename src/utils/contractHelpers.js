@@ -1,6 +1,6 @@
 import PicsumToken from '../../build/contracts/PicsumToken'
 import PicsumWallet from '../../build/contracts/PicsumWallet'
-import { getWeb3 } from '../utils/ethereum'
+import { getWeb3, getWeb3Sockets } from '../utils/ethereum'
 
 export const setupPicsumToken = async networkId => {
   const web3 = await getWeb3()
@@ -10,6 +10,16 @@ export const setupPicsumToken = async networkId => {
     PicsumToken.networks[networkId].address
   )
 
+  return picsumToken
+}
+
+export const setupPicsumTokenSockets = async networkId => {
+  console.log(networkId)
+  const web3 = await getWeb3Sockets()
+  const picsumToken = new web3.eth.Contract(
+    PicsumToken.abi,
+    PicsumToken.networks[networkId].address
+  )
   return picsumToken
 }
 

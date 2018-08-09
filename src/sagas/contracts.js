@@ -8,7 +8,10 @@ import {
   take
 } from 'redux-saga/effects'
 import { eventChannel } from 'redux-saga'
-import { setupPicsumToken } from '../utils/contractHelpers'
+import {
+  setupPicsumToken,
+  setupPicsumTokenSockets
+} from '../utils/contractHelpers'
 import { errOccurred } from '../actions/errors'
 import {
   gotTotalSupply,
@@ -21,24 +24,23 @@ import {
 import { coinbaseSelector, networkIdSelector } from '../selectors/network'
 
 const picsumEventChannel = pmt =>
-  eventChannel(emitter => {
-    const picsumEvent = pmt.allEvents({
-      fromBlock: 'latest',
-      remove: true
+  eventChannel(emit => {
+    const picsumEvent = pmt.events.allEvents({
+      fromBlock: 'latest'
     })
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    picsumEvent.watch((err, res) => {
-      emitter(res)
-    })
+    picsumEvent.on('data', e => emit(e))
+    picsumEvent.on('changed', e => emit(e))
+    picsumEvent.on('error', () => picsumEvent.unsubscribe())
 
-    return () => picsumEvent.stopWatching()
+    return () => picsumEvent.unsubscribe()
   })
 
 function* watchForPicsumEvents() {
   try {
     const networkId = yield select(networkIdSelector)
-    const pmt = yield call(setupPicsumToken, networkId)
+    const pmt = yield call(setupPicsumTokenSockets, networkId)
     const channel = yield call(picsumEventChannel, pmt)
 
     while (true) {
@@ -54,7 +56,8 @@ function* handlePicsumEvent(picsumEvent) {
   try {
     console.log(picsumEvent)
     const coinbase = yield select(coinbaseSelector)
-    yield put(getUserTokens({payload: coinbase}))
+    // this really should use put with already created dispatcher... need to rename things...
+    yield call(getUserTokens, { payload: coinbase })
   } catch (err) {
     yield put(errOccurred, err.message, err.stack, 'handle picsum event')
   }

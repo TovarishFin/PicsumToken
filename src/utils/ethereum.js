@@ -33,6 +33,26 @@ export const getBlockNumber = () =>
     }
   })
 
+export const networkIdToName = networkId => {
+  switch (networkId) {
+    case '3':
+      return 'ropsten'
+    case '4':
+      return 'rinkeby'
+    case '42':
+      return 'kovan'
+    case '1':
+      return 'mainnet'
+    default:
+      return 'rinkeby'
+  }
+}
+
+export const getWeb3Sockets = networkId => {
+  console.log(networkId)
+  return new Web3(`wss://${networkIdToName(networkId)}.infura.io/ws`)
+}
+
 export const getWeb3 = () =>
   new Promise((resolve, reject) => {
     if (!window) {
@@ -54,7 +74,7 @@ export const getWeb3 = () =>
             web3_clientVersion: 'ZeroClientProvider'
           },
           getAccounts: cb => cb(null, []),
-          rpcUrl: 'https://kovan.infura.io'
+          rpcUrl: 'https://rinkeby.infura.io'
         })
         const web3 = new Web3(engine)
         window.web3 = web3
